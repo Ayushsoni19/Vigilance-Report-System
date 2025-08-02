@@ -1,0 +1,289 @@
+
+ {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vigilance Report</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #eaf4fc; /* Light Blue Background */
+      color: #222;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background: #121212;
+      color: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #0077cc;
+    }
+
+    .toggle-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-button:hover {
+      background: #0056b3;
+    }
+
+    form {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      color: #000;
+    }
+
+    body.dark-mode form {
+      background: #1e1e1e;
+      color: #f5f5f5;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      background: #f9f9f9;
+      color: #222;
+    }
+
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group textarea {
+      background: #2b2b2b;
+      color: #f5f5f5;
+      border: 1px solid #555;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .filter-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .filter-form .form-group {
+      flex: 1 1 220px;
+    }
+
+    button {
+      background: #28a745;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .export-links {
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    .export-links a {
+      margin-right: 15px;
+      text-decoration: none;
+      font-weight: 600;
+      color: #0077cc;
+    }
+
+    .export-links a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      color: #000;
+    }
+
+    body.dark-mode table {
+      background: #1f1f1f;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    body.dark-mode th, body.dark-mode td {
+      border-bottom: 1px solid #444;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    body.dark-mode th {
+      background: #2c2c2c;
+    }
+
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    body.dark-mode tr:nth-child(even) {
+      background: #2a2a2a;
+    }
+
+    tr:hover {
+      background: #eef6ff;
+    }
+
+    body.dark-mode tr:hover {
+      background: #333;
+    }
+
+    @media (max-width: 768px) {
+      .filter-form {
+        flex-direction: column;
+      }
+
+      .form-group {
+        width: 100%;
+      }
+
+      table, thead, tbody, th, td, tr {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+<h1>Vigilance Report</h1>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    {{ form.as_p }}
+  </div>
+  <button type="submit">Submit</button>
+</form>
+
+<form method="get" class="filter-form">
+  <div class="form-group">
+    <label>Show</label>
+    <select name="show">
+      <option>10</option>
+      <option>50</option>
+      <option>100</option>
+      <option>1000</option>
+      <option>10000</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>From</label>
+    <input type="date" name="from" value="{{ from }}">
+  </div>
+
+  <div class="form-group">
+    <label>To</label>
+    <input type="date" name="to" value="{{ to }}">
+  </div>
+
+  <div class="form-group">
+    <label>Search Name</label>
+    <input type="text" name="search" value="{{ search }}" placeholder="Search name...">
+  </div>
+
+  <div class="form-group">
+    <label>Search BP No</label>
+    <input type="text" name="bp_no" value="{{ bp_no }}" placeholder="Search BP No...">
+  </div>
+
+  <button type="submit">Filter</button>
+</form>
+
+<div class="export-links">
+  <a href="{% url 'export_excel' %}">Export to Excel</a> |
+  <a href="{% url 'export_pdf' %}">Export to PDF</a>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th><th>Name</th><th>Address</th><th>Zone</th><th>Public DC</th><th>BP No</th>
+      <th>Purpose</th><th>Load KW</th><th>Meter Make</th><th>Meter SN</th><th>Capacity</th>
+      <th>Pulse</th><th>Reading</th><th>MD</th><th>PH</th><th>Remark</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in entries %}
+    <tr>
+      <td>{{ e.date }}</td><td>{{ e.name }}</td><td>{{ e.address }}</td><td>{{ e.zone }}</td><td>{{ e.public_dc }}</td>
+      <td>{{ e.bp_no }}</td><td>{{ e.purpose }}</td><td>{{ e.load_kw }}</td><td>{{ e.meter_make }}</td><td>{{ e.meter_sn }}</td>
+      <td>{{ e.capacity }}</td><td>{{ e.pulse }}</td><td>{{ e.reading }}</td><td>{{ e.md }}</td><td>{{ e.ph }}</td><td>{{ e.remark }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark-mode");
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+  }
+</script>
+
+</body>
+</html>
+
+
